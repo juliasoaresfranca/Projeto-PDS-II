@@ -1,34 +1,42 @@
-#include <iostream>
-#include <string>
-#include <unordered_map>
+#include "Avaliacao.h"
+#include <stdexcept>
 
-class Avaliacao {
-public:
-    Cliente ClienteAvaliador;
+Avaliacao::Avaliacao() {
+    nota = 0;
+}
 
-    Avaliacao(int Nota, Cliente Avaliador) : nota(Nota), ClienteAvaliador(Avaliador) {
-        if (Nota <= NOTA_MAX && Nota >= 0) {
-        } else {
-            throw std::invalid_argument("A nota fornecida est√° fora do intervalo v√°lido.");
-        }
+Avaliacao::Avaliacao(int notaRecebida)
+{
+    if (notaRecebida < 0 || notaRecebida > NOTA_MAX) {
+        throw std::invalid_argument("Nota inv·lida");
     }
 
-    virtual std::string ImprimirAval() const{
-        std::string retorno = "Nota: " + std::to_string(nota) + "\n Avaliador: " + ClienteAvaliador.login;
-        return retorno;
+	this->nota = notaRecebida;
+}
+
+std::string Avaliacao::ImprimirAval()
+{
+	return "Nota: " + std::to_string(nota);
+}
+
+AvaliacaoEspecialista::AvaliacaoEspecialista()
+{
+    this->nota = 0;
+    this->descricao = "";
+}
+
+
+AvaliacaoEspecialista::AvaliacaoEspecialista(int Nota, const std::string DescricaoRecebida)
+{
+    if (Nota < 0 || Nota > NOTA_MAX) {
+        throw std::invalid_argument("Nota inv·lida");
     }
 
-protected:
-    int nota;
-    const int NOTA_MAX = 5;
-};
+    this->nota = Nota;
+    this->descricao = DescricaoRecebida;
+}
 
-class AvaliacaoEspecialista : public Avaliacao {
-public:
-    std::string descricao;
-
-    std::string ImprimirAval() const override {
-        std::string retorno = "Nota: " + std::to_string(nota) + "\n Avaliador: " + ClienteAvaliador.login + "\n Descricao: " + descricao;
-        return retorno;
-    }
-};
+std::string AvaliacaoEspecialista::ImprimirAval()
+{
+	return "Nota: " + std::to_string(nota) + "\n Avaliador: " + "\n Descricao: " + this->descricao;
+}
