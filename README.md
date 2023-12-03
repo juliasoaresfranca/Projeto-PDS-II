@@ -12,11 +12,9 @@ O gerenciador oferece as seguintes funcionalidades:
 
     Atualizar Informações: Os usuários podem atualizar as informações de uma série ou um filme em sua lista, como classificação, status de conclusão, entre outros.
 
-    Remover Séries e Filmes: Os usuários podem remover séries e filmes da sua lista.
-
     Salvar e Carregar Dados: As informações sobre séries e filmes são salvas em um arquivo para que os usuários possam retomar o uso do programa em sessões futuras.
-
-    Cadastrar diversos usuários e administradores do sistema.
     
     
 Futuras atualizações serão feitas para complementar o programa.
+
+Para executar o programa baixe todos os arquivos da pasta código e execute o Main.exe
