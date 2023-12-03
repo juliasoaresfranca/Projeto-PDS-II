@@ -1,96 +1,104 @@
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include <fstream>
+#include "Streaming.h"
+#include "ListaMidia.h"
 #include <sstream>
-#include <vector>
+#include <iostream>
+#include <map>
 #include <algorithm>
-#include <functional>
-#include "Cliente.cpp"
+// Implementa  o do construtor
+Streaming::Streaming() {
+}
 
-class Streaming {
-public:
-    std::unordered_map<std::string, Cliente> clientesCadastrados;
-    ListaMidia midiasCadastradas;
+Midia Streaming::buscarMidiaCadastrada(std::string& Id)
+{
+    if(!midiasCadastradas.isVazia()){
+    return midiasCadastradas.Buscar(Id);
+    }
+    return Midia();
+}
 
-    Streaming() {
-        // Construtor da classe Streaming.
+// Verifica se um cliente est  cadastrado
+bool Streaming::verificarClienteCadastrado(std::string loginRecebido, std::string senhaRecebida) {
+    auto it = clientesCadastrados.find(loginRecebido);
+    if (it != clientesCadastrados.end() && it->second.ConfirmarSenha(senhaRecebida)) {
+        return true;
+    }
+    return false;
+}
+
+// Confirma o login do cliente
+Cliente Streaming::confirmarLogin(std::string loginRecebido, std::string senhaRecebida) {
+
+    auto it = clientesCadastrados.find(loginRecebido);
+    if (it != clientesCadastrados.end() && it->second.ConfirmarSenha(senhaRecebida)) {
+        return it->second;  // Retorna o cliente encontrado
+    }
+    return Cliente();  // Retorna um cliente inv lido se o login falhar
+}
+
+// Cadastra um novo cliente
+void Streaming::cadastrarCliente(const std::string& Login, const std::string& Senha, const std::string& Nome, const std::string& CPF, const std::string& Endereco) {
+    // Verifica se o login j  est  cadastrado
+    auto it = clientesCadastrados.find(Login);
+    if (it != clientesCadastrados.end()) {
+        std::cout << "Login ja cadastrado. Escolha um login diferente.\n";
+        return;  // N o cadastra se o login j  existe
     }
 
-    Cliente entrar(const std::string& Login, const std::string& Senha) {
-        // Verifica se o cliente existe e retorna o cliente.
-        if (clientesCadastrados.count(Login) > 0) {
-            Cliente cliente = clientesCadastrados[Login];
-            return cliente;
-        }
-        return Cliente(); // Retorna um Cliente vazio se não encontrado.
+    // Se o login n o existe, cadastra o novo cliente
+    Cliente novoCliente(Nome, Login, Senha, CPF, Endereco);
+    clientesCadastrados[Login] = novoCliente;
+
+    std::cout << "Cliente cadastrado com sucesso!\n";
+}
+
+void Streaming::cadastrarMidia(const std::string& Id, std::string nome, std::string idioma, std::string genero, std::string data)
+{
+    if(!midiasCadastradas.Contem(Id)){
+    midiasCadastradas.AdicionarMidia(Id, nome, idioma, genero, data);
+    }
+    else {
+        std::cout << "Midia ja cadastrada no sistema!\n";
+    }
+}
+
+void Streaming::cadastrarSerie(std::string nome, std::string idioma, std::string genero, std::string data, std::string ID, int numeroEpisodios)
+ {
+
+    if (!midiasCadastradas.Contem(ID)) {
+        midiasCadastradas.AdicionarSerie(ID, nome, idioma, genero, data,numeroEpisodios);
+    }
+    else {
+        std::cout << "Serie ja cadastrada no sistema!\n";
     }
 
-    bool Confirmar(const std::string& Senha, const std::string& Login) {
-        // Verifica se o usuário inseriu a senha e login corretamente.
-        if (entrar(Login, Senha).login == Login) {
-            return true;
-        }
-        return false;
+}
+
+void Streaming::cadastrarFilme(const std::string& Id, std::string nome, std::string idioma, std::string genero, std::string data, float duracaoMinutos)
+{
+    if (!midiasCadastradas.Contem(Id)) {
+        midiasCadastradas.AdicionarFilme(Id, nome, idioma, genero, data, duracaoMinutos);
+    }
+    else {
+        std::cout << "Filme ja cadastrada no sistema!\n";
+    }
+}
+
+
+// Retorna as Top 10 m dias
+std::string Streaming::Top10Midias() {
+
+    std::list<Midia> topMidias = midiasCadastradas.top10Midias();
+
+    std::ostringstream result;
+
+    for (const Midia& midia : topMidias) {
+        result << "Nome: " << midia.nome << ", Avaliacao: " << midia.mediaAvaliacao() << "\n";
     }
 
-    void cadastrar(const std::string& Login, const std::string& Senha, const std::string& Nome) {
-        // Cria um usuário e insere ele na lista de usuários cadastrados.
-        if (!Confirmar(Senha, Login)) {
-            Cliente novoCliente(Nome, Login, Senha);
-            clientesCadastrados[Login] = novoCliente;
-        } else {
-            throw std::exception();
-        }
-    }
+    return result.str();
+}
 
-    // Implemente os outros métodos da classe Streaming.
-
-    std::string Top10Midias() {
-        // Analisa quais são as 10 mídias com 100 ou mais visualizações com melhor avaliação.
-        return "";
-    }
-
-    std::string porcentagemClientes15Aval() {
-        // Retorna a porcentagem total de clientes que assistiram pelo menos 15 mídias.
-        return "";
-    }
-
-    std::string clienteComMaisAvaliacoes() {
-        // Retorna o cliente com mais avaliações dentro dos clientes cadastrados.
-        return "";
-    }
-
-    std::string clienteComMaisMidiasVistas() {
-        // Retorna o cliente com mais mídias vistas dentro dos clientes cadastrados.
-        return "";
-    }
-
-    std::string midiasComMaisViews() {
-        // Analisa quais são as 10 mídias com mais visualizações.
-        return "";
-    }
-
-    std::string midiascomMelhorAvaliacoesPorGenero(const std::string& Genero) {
-        // Analisa quais são as 10 mídias com a melhor média de avaliações e que tenham sido vistas pelo menos 100 vezes, separados por gênero.
-        return "";
-    }
-
-    std::string maisVistasPorGenero(const std::string& Genero) {
-        // Analisa quais são as 10 mídias com mais visualizações, separados por gênero.
-        return "";
-    }
-};
-
-int main() {
-    // Exemplo de uso da classe Streaming.
-    Streaming streaming;
-    Cliente cliente = streaming.entrar("usuario123", "senha123");
-    if (!cliente.login.empty()) {
-        std::cout << "Cliente encontrado: " << cliente.login << std::endl;
-    } else {
-        std::cout << "Cliente não encontrado." << std::endl;
-    }
-
-    return 0;
+std::string Streaming::imprimirListaDeMidias()
+{
+    return midiasCadastradas.toString();
 }
