@@ -1,59 +1,75 @@
+#include "Cliente.h"
 #include <string>
-#include "ListaMidia.cpp"
-#include "Midia.cpp"
 
-class Cliente {
-public:
-    std::string nome;
-    std::string login;
-    std::string senha;
-    ListaMidia MidiasAssistidas;
-    ListaMidia MidiasFuturas;
-    ListaMidia MidiasAvaliadas;
-    const int QUANTIDADE_PARA_ESPECIALISTA = 5;
 
-    void init(std::string nome, std::string login, std::string senha) {
-        this->login = login;
-        this->senha = senha;
-        this->nome = nome;
+Cliente::Cliente(std::string nome, std::string login, std::string senha, std::string CPF, std::string endereco)
+{
+
+	this->CPF = CPF;
+	this->nome = nome;
+	this->endereco = endereco;
+	this->login = login;
+	this->senha = senha;
+
+}
+
+Cliente::Cliente()
+{
+
+	this->CPF = "";
+	this->nome = "";
+	this->endereco = "";
+	this->login = "";
+	this->senha = "";
+
+}
+
+bool Cliente::ConfirmarSenha(std::string senhaDigitada) {
+
+	return senhaDigitada == senha;
+
+}
+
+Cliente& Cliente::operator=(const Cliente& other)
+{
+    if (this != &other)
+    {
+        this->CPF = other.CPF;
+        this->nome = other.nome;
+        this->endereco = other.endereco;
+        this->login = other.login;
+        this->senha = other.senha;
     }
+    return *this;
+}
 
-    Cliente(std::string nome, std::string login, std::string senha) {
-        init(nome, login, senha);
-    }
+void Cliente::AvaliarMidia(Midia Avaliada,int nota)
+{
 
-    bool podeSerEspecialista() {
-        return this->MidiasAvaliadas.tamanhoLista() >= QUANTIDADE_PARA_ESPECIALISTA;
-    }
+	if(midiasAssistidas.Contem(Avaliada.ID) && !midiasAvaliadas.Contem(Avaliada.ID)){
 
-    void assistir(Midia& assistida) {
-        if (!MidiasAssistidas.Contem(assistida.ID)) {
-            assistida.AdicionarView();
-            MidiasAssistidas.AdicionarMidia(assistida.ID, assistida);
+	Avaliacao novaAval(nota);
+	Midia atualizar = midiasAssistidas.Buscar(Avaliada.ID);
+	atualizar.AdicionarAvaliacao(novaAval);
+	midiasAvaliadas.AdcionarMidiaExistente(atualizar);
+	}
 
-            if (MidiasFuturas.Contem(assistida.ID)) {
-                MidiasFuturas.RemoverMidia(assistida.ID);
-            }
-        }
-    }
+}
 
-    void planejarParaAssistir(Midia& planejada) {
-        if (!MidiasFuturas.Contem(planejada.ID))
-            MidiasFuturas.AdicionarMidia(planejada.ID, planejada);
-    }
+void Cliente::AssistirMidia(Midia Adicionada)
+{
+	midiasAssistidas.AdcionarMidiaExistente(Adicionada);
+}
 
-    void Avaliar(Midia& MidiaAvaliada, int nota, std::string Descricao) {
-        if (!this->MidiasAvaliadas.Contem(MidiaAvaliada.ID)) {
-            Avaliacao novaAval(nota, *this);
-            MidiaAvaliada.ReceberAvaliacao(novaAval);
-            this->MidiasAvaliadas.AdicionarMidia(MidiaAvaliada.ID, MidiaAvaliada);
-        }
-    }
+std::string Cliente::midiasAssistidasToString()
+{
+	return midiasAssistidas.toString();
+}
 
-    std::string imprimirAvaliacoes() {
-        return this->MidiasAvaliadas.imprimirAvaliacoes(*this);
-    }
-};
+std::string Cliente::midiasAvaliadasToString()
+{
+	return midiasAvaliadas.toStringAvaliacoes();
+}
 
 class ClienteEspecialista : Cliente{
     
